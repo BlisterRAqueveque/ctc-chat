@@ -1,5 +1,6 @@
 import { addKeyword } from '@builderbot/bot';
 import { quieroSerClienteFlow } from './quiero-ser-cliente.flow.js';
+import { reactivarServicioFlow } from './reactivar-servicio.flow.js';
 
 const sam = `🙌 Hola! Soy *SAM* de Cooperativa Telefónica Centenario. Estoy para ayudarte.\nElija una opción:`;
 
@@ -21,8 +22,8 @@ export const mainMenuFlow = addKeyword(['hola', 'hi', 'menu']).addAnswer(
     switch (true) {
       case opt.includes('1'):
         return gotoFlow(quieroSerClienteFlow);
-      //case opt.includes('2'):
-      //return gotoFlow(reactivarServicioFlow);
+      case opt.includes('2'):
+        return gotoFlow(reactivarServicioFlow);
       //case opt.includes('3'):
       //return gotoFlow(clienteSocioFlow);
       default:

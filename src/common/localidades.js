@@ -1,0 +1,16 @@
+export const localidades = [
+  'Centenario',
+  'Vista Alegre',
+  'Lago Marimenuco',
+  'Senillosa',
+  'Plottier',
+  'La Dolfina',
+  'Picun Leufu',
+  'Cinco Saltos',
+  'Cordero',
+  'Barda del Medio',
+  'Villa Manzano',
+  'Allen*',
+  'Cipolletti*',
+  'Cordón del Valle',
+];

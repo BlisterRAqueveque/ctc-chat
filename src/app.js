@@ -10,6 +10,9 @@ import {
   otraLocalidad,
   preFinishFlow,
   finishFlow,
+  reactivarServicioFlow,
+  reactivarNombreFlow,
+  reactivarLocalidadFlow,
 } from './flows/index.js';
 import { envs } from './configuration/envs.js';
 
@@ -24,6 +27,10 @@ const main = async () => {
     ubicacionFlow,
     nombreFlow,
     otraLocalidad,
+
+    reactivarServicioFlow,
+    reactivarNombreFlow,
+    reactivarLocalidadFlow,
 
     preFinishFlow,
     finishFlow,
@@ -77,6 +84,46 @@ const main = async () => {
           .query(
             'INSERT INTO registros_registrar (localidad, lat, lon, ubicacion, nombre, telefono) VALUES (?, ?, ?, ?, ?, ?)',
             [localidad, lat, lon, ubicacion, nombre, telefono]
+          );
+
+        // result.insertId contiene el ID generado
+        // TODO La idea es poder insertar en ODOO, y enviar el n° de ticket al usuario
+        const ticketId = result.insertId;
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ status: 'ok', ticketId }));
+      } catch (error) {
+        console.error(error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        return res.end(
+          JSON.stringify({ status: 'error', message: error.message })
+        );
+      }
+    })
+  );
+
+  await adapterDB.db.promise().query(`
+    CREATE TABLE IF NOT EXISTS registros_reactivar (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      localidad INT,
+      dni VARCHAR(200),
+      nombre VARCHAR(200),
+      telefono VARCHAR(200),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  adapterProvider.server.post(
+    '/v1/reactivar-servicio',
+    handleCtx(async (_, req, res) => {
+      try {
+        const { localidad, nombre, telefono, dni } = req.body;
+
+        //! Insertamos los datos en nuestra base de datos personal
+        const [result] = await adapterDB.db
+          .promise()
+          .query(
+            'INSERT INTO registros_reactivar (localidad, nombre, telefono, dni) VALUES (?, ?, ?, ?)',
+            [localidad, nombre, telefono, dni]
           );
 
         // result.insertId contiene el ID generado

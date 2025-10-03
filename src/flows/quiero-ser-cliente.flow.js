@@ -1,23 +1,7 @@
 import { addKeyword, utils } from '@builderbot/bot';
 import { preFinishFlow } from './end.flow.js';
 import { envs } from '../configuration/envs.js';
-
-const localidades = [
-  'Centenario',
-  'Vista Alegre',
-  'Lago Marimenuco',
-  'Senillosa',
-  'Plottier',
-  'La Dolfina',
-  'Picun Leufu',
-  'Cinco Saltos',
-  'Cordero',
-  'Barda del Medio',
-  'Villa Manzano',
-  'Allen*',
-  'Cipolletti*',
-  'Cordón del Valle',
-];
+import { localidades } from '../common/index.js';
 
 const textLocalidad = `Indica tu Localidad:`;
 
