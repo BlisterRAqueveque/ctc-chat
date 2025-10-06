@@ -1,6 +1,7 @@
 import { createBot, createFlow, createProvider } from '@builderbot/bot';
 import { MysqlAdapter as Database } from '@builderbot/database-mysql';
 import { BaileysProvider as Provider } from '@builderbot/provider-baileys';
+
 import {
   mainMenuFlow,
   registrar,
@@ -13,7 +14,15 @@ import {
   reactivarServicioFlow,
   reactivarNombreFlow,
   reactivarLocalidadFlow,
+  socioFlow,
+  socioNombreFlow,
+  socioDNIFlow,
+  mainClientFlow,
+  aboutClientFlow,
+  miServicioFlow,
+  endMessageFlow,
 } from './flows/index.js';
+
 import { envs } from './configuration/envs.js';
 
 const PORT = envs.PORT;
@@ -31,6 +40,15 @@ const main = async () => {
     reactivarServicioFlow,
     reactivarNombreFlow,
     reactivarLocalidadFlow,
+
+    socioFlow,
+    socioDNIFlow,
+    socioNombreFlow,
+
+    mainClientFlow,
+    aboutClientFlow,
+    miServicioFlow,
+    endMessageFlow,
 
     preFinishFlow,
     finishFlow,
@@ -132,6 +150,49 @@ const main = async () => {
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ status: 'ok', ticketId }));
+      } catch (error) {
+        console.error(error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        return res.end(
+          JSON.stringify({ status: 'error', message: error.message })
+        );
+      }
+    })
+  );
+
+  adapterProvider.server.get(
+    '/v1/cliente/:nro_cliente',
+    handleCtx(async (_, req, res) => {
+      try {
+        const { nro_cliente } = req.params;
+
+        if (!nro_cliente) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          return res.end(
+            JSON.stringify({
+              status: 404,
+              message: 'miss_params',
+            })
+          );
+        }
+
+        // TODO Buscamos el cliente en la base de datos de ODOO (acá simulamos con una db local)
+        const [result] = await adapterDB.db
+          .promise()
+          .query('SELECT * FROM clientes WHERE nro_cliente = ?', [nro_cliente]);
+
+        if (result.length == 0) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          return res.end(
+            JSON.stringify({
+              status: 404,
+              message: 'no_client',
+            })
+          );
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ status: 200, client: result[0] }));
       } catch (error) {
         console.error(error);
         res.writeHead(500, { 'Content-Type': 'application/json' });
