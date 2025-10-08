@@ -21,6 +21,10 @@ import {
   aboutClientFlow,
   miServicioFlow,
   endMessageFlow,
+  endMessageAboutFlow,
+  cambioDomicilioFlow,
+  aumentarVelocidadFlow,
+  otrasConsultasFlow,
 } from './flows/index.js';
 
 import { envs } from './configuration/envs.js';
@@ -48,6 +52,10 @@ const main = async () => {
     mainClientFlow,
     aboutClientFlow,
     miServicioFlow,
+    endMessageAboutFlow,
+    cambioDomicilioFlow,
+    aumentarVelocidadFlow,
+    otrasConsultasFlow,
     endMessageFlow,
 
     preFinishFlow,
@@ -78,8 +86,8 @@ const main = async () => {
       lat VARCHAR(255),
       lon VARCHAR(255),
       ubicacion VARCHAR(255),
-      nombre VARCHAR(100),
-      telefono VARCHAR(20),
+      nombre VARCHAR(255),
+      telefono VARCHAR(255),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -124,9 +132,9 @@ const main = async () => {
     CREATE TABLE IF NOT EXISTS registros_reactivar (
       id INT AUTO_INCREMENT PRIMARY KEY,
       localidad INT,
-      dni VARCHAR(200),
-      nombre VARCHAR(200),
-      telefono VARCHAR(200),
+      dni VARCHAR(255),
+      nombre VARCHAR(255),
+      telefono VARCHAR(255),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -193,6 +201,59 @@ const main = async () => {
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ status: 200, client: result[0] }));
+      } catch (error) {
+        console.error(error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        return res.end(
+          JSON.stringify({ status: 'error', message: error.message })
+        );
+      }
+    })
+  );
+
+  await adapterDB.db.promise().query(`
+    CREATE TABLE IF NOT EXISTS registros_clientes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nro_cliente VARCHAR(255),
+      telefono VARCHAR(255),
+      dni VARCHAR(255),
+      nombre VARCHAR(255),
+      consulta VARCHAR(255),
+      lat VARCHAR(255),
+      lon VARCHAR(255),
+      ubicacion VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  adapterProvider.server.post(
+    '/v1/registros-cliente',
+    handleCtx(async (_, req, res) => {
+      try {
+        const {
+          nro_cliente,
+          nombre,
+          dni,
+          telefono,
+          consulta,
+          lat = '',
+          lon = '',
+          ubicacion = '',
+        } = req.body;
+
+        //! Insertamos los datos en nuestra base de datos personal
+        const [result] = await adapterDB.db
+          .promise()
+          .query(
+            'INSERT INTO registros_clientes (nro_cliente, nombre, dni, telefono, consulta, lat, lon, ubicacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [nro_cliente, nombre, dni, telefono, consulta, lat, lon, ubicacion]
+          );
+
+        // result.insertId contiene el ID generado
+        // TODO La idea es poder insertar en ODOO, y enviar el n° de ticket al usuario
+        const ticketId = result.insertId;
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ status: 'ok', ticketId }));
       } catch (error) {
         console.error(error);
         res.writeHead(500, { 'Content-Type': 'application/json' });
