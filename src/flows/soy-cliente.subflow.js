@@ -86,7 +86,44 @@ export const aboutClientFlow = addKeyword(
 
 //<============ OPCIÓN N° 1 ============>
 //TODO la data es la información del usuario (acá se deberá devolver la información del usuario, con el formato de Odoo)
+
 export const miServicioFlow = addKeyword(
+  utils.setEvent('MI_SERVICIO')
+).addAnswer(
+  'Sobre su servicio:',
+  null,
+  async (_, { flowDynamic, state, gotoFlow }) => {
+    try {
+      // Obtener datos del cliente desde Odoo (guardados en el state)
+      const { cliente_odoo } = state.getMyState();
+      
+      if (cliente_odoo) {
+        const info = `
+📋 *Información de su servicio:*
+
+👤 *Cliente:* ${cliente_odoo.name}
+🔢 *N° Contrato:* ${cliente_odoo.x_studio_id_de_contrato || 'No disponible'}
+📞 *Teléfono:* ${cliente_odoo.phone || 'No disponible'}
+📧 *Email:* ${cliente_odoo.email || 'No disponible'}
+🏠 *Dirección:* ${cliente_odoo.street || 'No disponible'}
+🏙️ *Ciudad:* ${cliente_odoo.city || 'No disponible'}
+        `;
+        
+        await flowDynamic(info);
+      } else {
+        await flowDynamic('❌ No se pudo obtener la información del servicio. Intente nuevamente.');
+      }
+
+    } catch (error) {
+      console.error('Error obteniendo información del servicio:', error);
+      await flowDynamic('⚠️ Error temporal obteniendo la información. Intente más tarde.');
+    }
+
+    return gotoFlow(endMessageAboutFlow);
+  }
+);
+
+/* export const miServicioFlow = addKeyword(
   utils.setEvent('MI_SERVICIO')
 ).addAnswer(
   'Sobre su servicio:',
@@ -105,7 +142,7 @@ export const miServicioFlow = addKeyword(
 
     return gotoFlow(endMessageAboutFlow);
   }
-);
+); */
 
 export const endMessageAboutFlow = addKeyword(
   utils.setEvent('END_FLOW_CLIENT')

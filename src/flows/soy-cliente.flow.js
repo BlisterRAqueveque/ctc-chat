@@ -1,6 +1,6 @@
 import { addKeyword, utils } from '@builderbot/bot';
-import { envs } from '../configuration/envs.js';
 import { mainClientFlow } from './soy-cliente.subflow.js';
+import { odooService } from '../services/odoo.service.js';
 
 const infoOne =
   'Para poder ayudarte, por favor Indicar:\n1. Nº de cliente/teléfono (ver como aparece el formato en Odoo)';
@@ -51,45 +51,66 @@ export const socioNombreFlow = addKeyword(
 
     await state.update({ nombre: opt });
 
-    //TODO validar nro_cliente
     const data = { ...state.getMyState(), telefono: ctx.from };
 
-    fetch(`${envs.API_URL}v1/cliente/${data.nro_cliente}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    })
-      .then(async (res) => {
-        const json = await res.json();
-        const { status = 500 } = json;
+    try {
+      await flowDynamic('🔍 Verificando tu información en nuestro sistema...');
 
-        switch (+status) {
-          case 200:
-            return gotoFlow(mainClientFlow);
-          case 404: {
-            const retry = state.get('retry');
-            if (retry == 1) {
-              return endFlow(
-                'No fue posible verificar su información. Un asesor ya recibió su consulta, a la brevedad le responderá en horario Comercial de Lunes a Viernes de 08.00 a 15.30 hs.'
-              );
-            }
-            await flowDynamic(`La información provista es incorrecta`);
-            await state.update({ retry: 1 });
-            return gotoFlow(socioFlow);
-          }
-          default:
-            await flowDynamic(
-              `Algo salió mal con nuestros servidores, favor de tener paciencia, ${status}`
+      console.log('[FLOW] Validando con Odoo:', data);
+
+      const resultado = await odooService.validarAsociado(
+        data.nro_cliente,
+        data.dni,
+        data.nombre
+      );
+
+      console.log('[FLOW] Resultado de Odoo:', resultado);
+
+      switch (resultado.status) {
+        case 200:
+          // Actualizamos el state con los datos de Odoo
+          await state.update({
+            cliente_odoo: resultado.data,
+            miServicio: JSON.stringify({
+              id: resultado.data.x_studio_id_de_contrato,
+              nombre: resultado.data.name,
+              telefono: resultado.data.phone,
+              email: resultado.data.email,
+              direccion: resultado.data.street,
+              ciudad: resultado.data.city,
+            }),
+          });
+          await flowDynamic(
+            `✅ ¡Perfecto! Hola ${resultado.data.name}.`
+          );
+          return gotoFlow(mainClientFlow);
+
+        case 404: {
+          const retry = state.get('retry');
+          if (retry == 1) {
+            return endFlow(
+              'No fue posible verificar su información. Un asesor ya recibió su consulta, a la brevedad le responderá en horario Comercial de Lunes a Viernes de 08.00 a 15.30 hs.'
             );
-            return gotoFlow(socioFlow);
+          }
+          await flowDynamic(
+            `La información provista es incorrecta. ${resultado.message}`
+          );
+          await state.update({ retry: 1 });
+          return gotoFlow(socioFlow);
         }
-      })
-      .catch(async (err) => {
-        await flowDynamic(
-          `Algo salió mal con nuestros servidores, favor de tener paciencia, ${JSON.stringify(
-            err
-          )}`
-        );
-        return gotoFlow(socioFlow);
-      });
+
+        default:
+          await flowDynamic(
+            `Algo salió mal con nuestros servidores, favor de tener paciencia. Código: ${resultado.status}`
+          );
+          return gotoFlow(socioFlow);
+      }
+    } catch (err) {
+      console.error('Error en validación con Odoo:', err);
+      await flowDynamic(
+        'Error temporal de conexión. Por favor, intenta nuevamente en unos momentos.'
+      );
+      return gotoFlow(socioFlow);
+    }
   }
 );

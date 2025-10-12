@@ -12,6 +12,12 @@ const envsSchema = joi
     MYSQL_DB_USER: joi.string().required(),
     MYSQL_DB_NAME: joi.string().required(),
     MYSQL_DB_PASSWORD: joi.string().allow('').optional(),
+    ODOO_URL: joi.string().required(),
+    ODOO_DB_NAME: joi.string().required(),
+    ODOO_USERNAME: joi.string().required(),
+    ODOO_USERID: joi.number().required(),
+    ODOO_PASSWORD: joi.string().required(),
+    ODOO_API_KEY: joi.string().required(),
   })
   .unknown(true);
 
@@ -27,4 +33,11 @@ export const envs = {
   MYSQL_DB_USER: envsVar.MYSQL_DB_USER,
   MYSQL_DB_NAME: envsVar.MYSQL_DB_NAME,
   MYSQL_DB_PASSWORD: envsVar.MYSQL_DB_PASSWORD,
+
+  ODOO_URL: envsVar.ODOO_URL,
+  ODOO_DB_NAME: envsVar.ODOO_DB_NAME,
+  ODOO_USERNAME: envsVar.ODOO_USERNAME,
+  ODOO_USERID: envsVar.ODOO_USERID,
+  ODOO_PASSWORD: envsVar.ODOO_PASSWORD,
+  ODOO_API_KEY: envsVar.ODOO_API_KEY,
 };
