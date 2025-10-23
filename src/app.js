@@ -2,30 +2,7 @@ import { createBot, createFlow, createProvider } from '@builderbot/bot';
 import { MysqlAdapter as Database } from '@builderbot/database-mysql';
 import { BaileysProvider as Provider } from '@builderbot/provider-baileys';
 
-import {
-  mainMenuFlow,
-  registrar,
-  quieroSerClienteFlow,
-  ubicacionFlow,
-  nombreFlow,
-  otraLocalidad,
-  preFinishFlow,
-  finishFlow,
-  reactivarServicioFlow,
-  reactivarNombreFlow,
-  reactivarLocalidadFlow,
-  socioFlow,
-  socioNombreFlow,
-  socioDNIFlow,
-  mainClientFlow,
-  aboutClientFlow,
-  miServicioFlow,
-  endMessageFlow,
-  endMessageAboutFlow,
-  cambioDomicilioFlow,
-  aumentarVelocidadFlow,
-  otrasConsultasFlow,
-} from './flows/index.js';
+import * as flows from './flows/index.js';
 
 import { envs } from './configuration/envs.js';
 
@@ -33,33 +10,35 @@ const PORT = envs.PORT;
 
 const main = async () => {
   const adapterFlow = createFlow([
-    mainMenuFlow,
+    flows.mainMenuFlow,
 
-    registrar,
-    quieroSerClienteFlow,
-    ubicacionFlow,
-    nombreFlow,
-    otraLocalidad,
+    flows.registrar,
+    flows.quieroSerClienteFlow,
+    flows.ubicacionFlow,
+    flows.nombreFlow,
+    flows.otraLocalidad,
 
-    reactivarServicioFlow,
-    reactivarNombreFlow,
-    reactivarLocalidadFlow,
+    flows.reactivarServicioFlow,
+    flows.reactivarNombreFlow,
+    flows.reactivarLocalidadFlow,
 
-    socioFlow,
-    socioDNIFlow,
-    socioNombreFlow,
+    flows.socioFlow,
+    flows.socioDNIFlow,
+    flows.socioNombreFlow,
 
-    mainClientFlow,
-    aboutClientFlow,
-    miServicioFlow,
-    endMessageAboutFlow,
-    cambioDomicilioFlow,
-    aumentarVelocidadFlow,
-    otrasConsultasFlow,
-    endMessageFlow,
+    flows.mainClientFlow,
+    flows.aboutClientFlow,
+    flows.miServicioFlow,
+    flows.endMessageAboutFlow,
+    flows.cambioDomicilioFlow,
+    flows.aumentarVelocidadFlow,
+    flows.otrasConsultasFlow,
+    flows.endMessageFlow,
 
-    preFinishFlow,
-    finishFlow,
+    flows.mainFacturaFlow,
+
+    flows.preFinishFlow,
+    flows.finishFlow,
   ]);
 
   const adapterProvider = createProvider(Provider);

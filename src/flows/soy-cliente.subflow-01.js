@@ -1,39 +1,6 @@
 import { addKeyword, utils } from '@builderbot/bot';
 import { envs } from '../configuration/envs.js';
-
-export const mainClientFlow = addKeyword(utils.setEvent('CLIENTES')).addAnswer(
-  'Bienvenido a nuestra gestión, por favor seleccione una opción para continuar:',
-  {
-    capture: true,
-    buttons: [
-      { body: '1. Quiero saber sobre mi servicio' },
-      { body: '2. Necesito mi factura' },
-      { body: '3. Medios de pago' },
-      { body: '4. Deseo hablar con un operador' },
-      { body: '5. Necesito soporte ó asistencia técnica' },
-    ],
-  },
-  async (ctx, { gotoFlow, fallBack }) => {
-    const opt = ctx.body;
-
-    if (opt == 'salir') return;
-
-    switch (true) {
-      case opt.includes('1'):
-        return gotoFlow(aboutClientFlow);
-      //   case opt.includes('2'):
-      //     return gotoFlow(reactivarServicioFlow);
-      //   case opt.includes('3'):
-      //     return gotoFlow(socioFlow);
-      //   case opt.includes('4'):
-      //     return gotoFlow(socioFlow);
-      //   case opt.includes('5'):
-      //     return gotoFlow(socioFlow);
-      default:
-        return fallBack('⚠️ Opción inválida.');
-    }
-  }
-);
+import { mainClientFlow } from './soy-cliente.flow.js';
 
 export const aboutClientFlow = addKeyword(
   utils.setEvent('SOBRE_SERVICIO')
@@ -76,8 +43,8 @@ export const aboutClientFlow = addKeyword(
       }
       case opt.includes('4'):
         return gotoFlow(otrasConsultasFlow);
-      //   case opt.includes('5'):
-      //     return gotoFlow(socioFlow);
+      case opt.includes('5'):
+        return gotoFlow(mainClientFlow);
       default:
         return fallBack('⚠️ Opción inválida.');
     }

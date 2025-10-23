@@ -1,6 +1,8 @@
 import { addKeyword, utils } from '@builderbot/bot';
-import { mainClientFlow } from './soy-cliente.subflow.js';
+// import { mainClientFlow } from './soy-cliente.subflow.js';
 import { odooService } from '../services/odoo.service.js';
+// import { envs } from '../configuration/envs.js';
+import { aboutClientFlow } from './soy-cliente.subflow-01.js';
 
 const infoOne =
   'Para poder ayudarte, por favor Indicar:\n1. Nº de cliente/teléfono (ver como aparece el formato en Odoo)';
@@ -111,6 +113,40 @@ export const socioNombreFlow = addKeyword(
         'Error temporal de conexión. Por favor, intenta nuevamente en unos momentos.'
       );
       return gotoFlow(socioFlow);
+    }
+  }
+);
+
+export const mainClientFlow = addKeyword(utils.setEvent('CLIENTES')).addAnswer(
+  'Bienvenido a nuestra gestión, por favor seleccione una opción para continuar:',
+  {
+    capture: true,
+    buttons: [
+      { body: '1. Quiero saber sobre mi servicio' },
+      { body: '2. Necesito mi factura' },
+      { body: '3. Medios de pago' },
+      { body: '4. Deseo hablar con un operador' },
+      { body: '5. Necesito soporte ó asistencia técnica' },
+    ],
+  },
+  async (ctx, { gotoFlow, fallBack }) => {
+    const opt = ctx.body;
+
+    if (opt == 'salir') return;
+
+    switch (true) {
+      case opt.includes('1'):
+        return gotoFlow(aboutClientFlow);
+      //   case opt.includes('2'):
+      //     return gotoFlow(reactivarServicioFlow);
+      //   case opt.includes('3'):
+      //     return gotoFlow(socioFlow);
+      //   case opt.includes('4'):
+      //     return gotoFlow(socioFlow);
+      //   case opt.includes('5'):
+      //     return gotoFlow(socioFlow);
+      default:
+        return fallBack('⚠️ Opción inválida.');
     }
   }
 );
