@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
         "Odoo"
-    ]
+    ],
+    "search.exclude": {
+        "**/node_modules": false
+    }
 }
