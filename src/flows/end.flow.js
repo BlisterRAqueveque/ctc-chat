@@ -1,19 +1,21 @@
 import { addKeyword, utils } from '@builderbot/bot';
 import { mainMenuFlow } from './main.flow.js';
 
+const text = '\nSi (*volver al menú principal*)\nNo';
+
 export const preFinishFlow = addKeyword(
   utils.setEvent('FINISH_FLOW')
 ).addAnswer(
-  '¿Tiene otra Consulta?',
+  '¿Tiene otra Consulta?' + text,
   {
     capture: true,
-    buttons: [{ body: 'Si (volver al menú principal)' }, { body: 'NO' }],
+    // buttons: [{ body: 'Si (volver al menú principal)' }, { body: 'NO' }],
   },
   async (ctx, { gotoFlow }) => {
     const opt = ctx.body;
 
-    switch (opt.toLocaleLowerCase()) {
-      case 'si (volver al menú principal)':
+    switch (true) {
+      case opt.toLocaleLowerCase().contains('si'):
         return gotoFlow(mainMenuFlow);
       default:
         return gotoFlow(finishFlow);

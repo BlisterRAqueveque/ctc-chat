@@ -40,12 +40,15 @@ export const reactivarNombreFlow = addKeyword(
 export const reactivarLocalidadFlow = addKeyword(
   utils.setEvent('REACTIVAR_LOCALIDAD_SERVICIO')
 ).addAnswer(
-  'Indica tu Localidad:',
+  'Indica tu Localidad:' +
+    localidades.map((localidad, i) => {
+      return { body: `\n${i + 1}. ${localidad}` };
+    }),
   {
     capture: true,
-    buttons: localidades.map((localidad, i) => {
-      return { body: `${i + 1}. ${localidad}` };
-    }),
+    // buttons: localidades.map((localidad, i) => {
+    //   return { body: `${i + 1}. ${localidad}` };
+    // }),
   },
   async (ctx, { state, fallBack, gotoFlow, endFlow }) => {
     const opt = ctx.body.trim().toLowerCase();

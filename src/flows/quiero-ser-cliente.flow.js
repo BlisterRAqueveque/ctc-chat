@@ -7,17 +7,20 @@ const textLocalidad = `Indica tu Localidad:`;
 
 const textServicio = '¿Qué tipo de servicio deseas?';
 
+const textOpciones =
+  '\n1. *Quiero servicio para mi HOGAR*\n2. *Quiero servicio para mi COMERCIO/OFICINA*\n3. *Quiero servicio para mi EMPRESA/CORPORATIVO*';
+
 export const quieroSerClienteFlow = addKeyword(
   utils.setEvent('SER_CLIENTE')
 ).addAnswer(
-  textServicio,
+  textServicio + textOpciones,
   {
     capture: true,
-    buttons: [
-      { body: '1. Quiero servicio para mi HOGAR' },
-      { body: '2. Quiero servicio para mi COMERCIO/OFICINA' },
-      { body: '3. Quiero servicio para mi EMPRESA/CORPORATIVO' },
-    ],
+    // buttons: [
+    //   { body: '1. Quiero servicio para mi HOGAR' },
+    //   { body: '2. Quiero servicio para mi COMERCIO/OFICINA' },
+    //   { body: '3. Quiero servicio para mi EMPRESA/CORPORATIVO' },
+    // ],
   },
   async (ctx, { gotoFlow, fallBack }) => {
     const opt = ctx.body.trim();
@@ -33,12 +36,12 @@ export const quieroSerClienteFlow = addKeyword(
 );
 
 export const registrar = addKeyword(utils.setEvent('REGISTRAR')).addAnswer(
-  textLocalidad,
+  textLocalidad + localidades.map((localidad, i) => `\n${i + 1}. ${localidad}`),
   {
     capture: true,
-    buttons: localidades.map((localidad, i) => {
-      return { body: `${i + 1}. ${localidad}` };
-    }),
+    // buttons: localidades.map((localidad, i) => {
+    //   return { body: `${i + 1}. ${localidad}` };
+    // }),
   },
   async (ctx, { state, fallBack, gotoFlow }) => {
     const opt = ctx.body.trim().toLowerCase();

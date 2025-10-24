@@ -2,19 +2,22 @@ import { addKeyword, utils } from '@builderbot/bot';
 import { envs } from '../configuration/envs.js';
 import { mainClientFlow } from './soy-cliente.flow.js';
 
+const textAbout =
+  '\n1. *¿Qué servicio tengo?*\n2. *Cambio de domicilio*\n3. *Aumentar la velocidad*\n4. *Otras consultas*\n5. *Volver al menú*';
+
 export const aboutClientFlow = addKeyword(
   utils.setEvent('SOBRE_SERVICIO')
 ).addAnswer(
-  'Quiero saber sobre mi servicio',
+  'Quiero saber sobre mi servicio (*solo números*)' + textAbout,
   {
     capture: true,
-    buttons: [
-      { body: '1. ¿Qué servicio tengo?' },
-      { body: '2. Cambio de domicilio' },
-      { body: '3. Aumentar la velocidad' },
-      { body: '4. Otras consultas' },
-      { body: '5. Volver al menú' },
-    ],
+    // buttons: [
+    //   { body: '1. ¿Qué servicio tengo?' },
+    //   { body: '2. Cambio de domicilio' },
+    //   { body: '3. Aumentar la velocidad' },
+    //   { body: '4. Otras consultas' },
+    //   { body: '5. Volver al menú' },
+    // ],
   },
   async (ctx, { fallBack, gotoFlow, state }) => {
     const opt = ctx.body;
@@ -63,7 +66,7 @@ export const miServicioFlow = addKeyword(
     try {
       // Obtener datos del cliente desde Odoo (guardados en el state)
       const { cliente_odoo } = state.getMyState();
-      
+
       if (cliente_odoo) {
         const info = `
 📋 *Información de su servicio:*
@@ -75,15 +78,18 @@ export const miServicioFlow = addKeyword(
 🏠 *Dirección:* ${cliente_odoo.street || 'No disponible'}
 🏙️ *Ciudad:* ${cliente_odoo.city || 'No disponible'}
         `;
-        
+
         await flowDynamic(info);
       } else {
-        await flowDynamic('❌ No se pudo obtener la información del servicio. Intente nuevamente.');
+        await flowDynamic(
+          '❌ No se pudo obtener la información del servicio. Intente nuevamente.'
+        );
       }
-
     } catch (error) {
       console.error('Error obteniendo información del servicio:', error);
-      await flowDynamic('⚠️ Error temporal obteniendo la información. Intente más tarde.');
+      await flowDynamic(
+        '⚠️ Error temporal obteniendo la información. Intente más tarde.'
+      );
     }
 
     return gotoFlow(endMessageAboutFlow);
@@ -111,17 +117,20 @@ export const miServicioFlow = addKeyword(
   }
 ); */
 
+const textEnd =
+  '\n0. *Mejorar / cambiar mi servicio*\n1. *Volver al menú*\n2. *Finalizar*';
+
 export const endMessageAboutFlow = addKeyword(
   utils.setEvent('END_FLOW_CLIENT')
 ).addAnswer(
-  '¿Qué desea hacer ahora?',
+  '¿Qué desea hacer ahora? (*solo números*)' + textEnd,
   {
     capture: true,
-    buttons: [
-      { body: '0. Mejorar / cambiar mi servicio' },
-      { body: '1. Volver al menú' },
-      { body: '2. Finalizar' },
-    ],
+    // buttons: [
+    //   { body: '0. Mejorar / cambiar mi servicio' },
+    //   { body: '1. Volver al menú' },
+    //   { body: '2. Finalizar' },
+    // ],
   },
   async (ctx, { gotoFlow, endFlow, fallBack, state, flowDynamic }) => {
     const opt = ctx.body.toLocaleLowerCase();
@@ -452,13 +461,15 @@ export const otrasConsultasFlow = addKeyword(
 );
 //<============ OPCIÓN N° 4 ============>
 
+const textEnd2 = '\n1. *Volver al menú*\n2. *Finalizar*';
+
 export const endMessageFlow = addKeyword(
   utils.setEvent('END_FLOW_CLIENT')
 ).addAnswer(
-  '¿Qué desea hacer ahora?',
+  '¿Qué desea hacer ahora? (*solo números*)' + textEnd2,
   {
     capture: true,
-    buttons: [{ body: '1. Volver al menú' }, { body: '2. Finalizar' }],
+    // buttons: [{ body: '1. Volver al menú' }, { body: '2. Finalizar' }],
   },
   async (ctx, { gotoFlow, endFlow, fallBack }) => {
     const opt = ctx.body.toLocaleLowerCase();

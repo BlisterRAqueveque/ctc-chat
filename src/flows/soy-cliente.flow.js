@@ -82,9 +82,7 @@ export const socioNombreFlow = addKeyword(
               ciudad: resultado.data.city,
             }),
           });
-          await flowDynamic(
-            `✅ ¡Perfecto! Hola ${resultado.data.name}.`
-          );
+          await flowDynamic(`✅ ¡Perfecto! Hola ${resultado.data.name}.`);
           return gotoFlow(mainClientFlow);
 
         case 404: {
@@ -117,17 +115,22 @@ export const socioNombreFlow = addKeyword(
   }
 );
 
+const textOpciones =
+  '\n1. *Quiero saber sobre mi servicio*\n2. *Necesito mi factura*\n3. *Medios de pago*\n4. *Deseo hablar con un operador*\n5. *Necesito soporte ó asistencia técnica*';
+
 export const mainClientFlow = addKeyword(utils.setEvent('CLIENTES')).addAnswer(
-  'Bienvenido a nuestra gestión, por favor seleccione una opción para continuar:',
+  // 'Bienvenido a nuestra gestión, por favor seleccione una opción para continuar:',
+  'Bienvenido a nuestra gestión, por favor ingrese una opción para continuar (*solo números*):' +
+    textOpciones,
   {
     capture: true,
-    buttons: [
-      { body: '1. Quiero saber sobre mi servicio' },
-      { body: '2. Necesito mi factura' },
-      { body: '3. Medios de pago' },
-      { body: '4. Deseo hablar con un operador' },
-      { body: '5. Necesito soporte ó asistencia técnica' },
-    ],
+    // buttons: [
+    //   { body: '1. Quiero saber sobre mi servicio' },
+    //   { body: '2. Necesito mi factura' },
+    //   { body: '3. Medios de pago' },
+    //   { body: '4. Deseo hablar con un operador' },
+    //   { body: '5. Necesito soporte ó asistencia técnica' },
+    // ],
   },
   async (ctx, { gotoFlow, fallBack }) => {
     const opt = ctx.body;

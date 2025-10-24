@@ -3,17 +3,20 @@ import { quieroSerClienteFlow } from './quiero-ser-cliente.flow.js';
 import { reactivarServicioFlow } from './reactivar-servicio.flow.js';
 import { socioFlow } from './soy-cliente.flow.js';
 
-const sam = `🙌 Hola! Soy *SAM* de Cooperativa Telefónica Centenario. Estoy para ayudarte.\nElija una opción:`;
+// const sam = `🙌 Hola! Soy *SAM* de Cooperativa Telefónica Centenario. Estoy para ayudarte.\nElija una opción:`;
+const sam = `🙌 Hola! Soy *SAM* de Cooperativa Telefónica Centenario. Estoy para ayudarte.\nIngrese una opción (*solo números*):`;
+
+const opciones = `\n1. *Quiero ser cliente*\n2. *Fui cliente y quiero reactivar el servicio*\n3. *Soy cliente / socio*`;
 
 export const mainMenuFlow = addKeyword(['hola', 'hi', 'menu']).addAnswer(
-  sam,
+  sam + opciones,
   {
     capture: true,
-    buttons: [
-      { body: '1. Quiero ser cliente' },
-      { body: '2. Fui cliente y quiero reactivar el Servicio' },
-      { body: '3. Soy cliente/socio' },
-    ],
+    // buttons: [
+    //   { body: '1. Quiero ser cliente' },
+    //   { body: '2. Fui cliente y quiero reactivar el Servicio' },
+    //   { body: '3. Soy cliente/socio' },
+    // ],
   },
   async (ctx, { gotoFlow, fallBack }) => {
     const opt = ctx.body.trim().toLocaleLowerCase();
