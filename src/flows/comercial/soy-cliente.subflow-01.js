@@ -1,5 +1,5 @@
 import { addKeyword, utils } from '@builderbot/bot';
-import { envs } from '../configuration/envs.js';
+import { envs } from '../../configuration/envs.js';
 import { mainClientFlow } from './soy-cliente.flow.js';
 
 const textAbout = [

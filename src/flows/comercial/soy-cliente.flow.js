@@ -1,6 +1,6 @@
 import { addKeyword, utils } from '@builderbot/bot';
 // import { mainClientFlow } from './soy-cliente.subflow.js';
-import { odooService } from '../services/odoo.service.js';
+// import { odooService } from '../services/odoo.service.js';
 // import { envs } from '../configuration/envs.js';
 import { aboutClientFlow } from './soy-cliente.subflow-01.js';
 
@@ -60,11 +60,21 @@ export const socioNombreFlow = addKeyword(
 
       console.log('[FLOW] Validando con Odoo:', data);
 
-      const resultado = await odooService.validarAsociado(
-        data.nro_cliente,
-        data.dni,
-        data.nombre
-      );
+      // const resultado = await odooService.validarAsociado(
+      //   data.nro_cliente,
+      //   data.dni,
+      //   data.nombre
+      // );
+      const resultado = {
+        data: {
+          x_studio_id_de_contrato: 'x_studio_id_de_contrato',
+          name: 'name',
+          phone: 'phone',
+          email: 'email',
+          street: 'street',
+          city: 'city',
+        },
+      };
 
       console.log('[FLOW] Resultado de Odoo:', resultado);
 

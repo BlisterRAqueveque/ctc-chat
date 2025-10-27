@@ -1,7 +1,7 @@
 import { addKeyword, utils } from '@builderbot/bot';
 import { preFinishFlow } from './end.flow.js';
-import { envs } from '../configuration/envs.js';
-import { localidades } from '../common/index.js';
+import { envs } from '../../configuration/envs.js';
+import { localidades } from '../../common/index.js';
 
 const textLocalidad = `Indica tu Localidad:`;
 

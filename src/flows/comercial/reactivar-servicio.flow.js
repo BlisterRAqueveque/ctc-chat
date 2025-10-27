@@ -1,7 +1,7 @@
 import { addKeyword, utils } from '@builderbot/bot';
-import { localidades } from '../common/index.js';
+import { localidades } from '../../common/index.js';
 import { otraLocalidad } from './quiero-ser-cliente.flow.js';
-import { envs } from '../configuration/envs.js';
+import { envs } from '../../configuration/envs.js';
 
 export const reactivarServicioFlow = addKeyword(
   utils.setEvent('REACTIVAR_SERVICIO')

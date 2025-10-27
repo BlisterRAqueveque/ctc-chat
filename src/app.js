@@ -39,6 +39,13 @@ const main = async () => {
 
     flows.preFinishFlow,
     flows.finishFlow,
+
+    /** Asistencia técnica */
+    flows.soportePrincipalFlow,
+    flows.soporteInternetFlow,
+    flows.soporteTelefoniaFlow,
+    flows.soporteAsistenciaFlow,
+    flows.soporteOtrosFlow,
   ]);
 
   const adapterProvider = createProvider(Provider);
