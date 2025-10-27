@@ -7,13 +7,16 @@ const textLocalidad = `Indica tu Localidad:`;
 
 const textServicio = '¿Qué tipo de servicio deseas?';
 
-const textOpciones =
-  '\n1. *Quiero servicio para mi HOGAR*\n2. *Quiero servicio para mi COMERCIO/OFICINA*\n3. *Quiero servicio para mi EMPRESA/CORPORATIVO*';
+const textOpciones = [
+  { body: '1. *Quiero servicio para mi HOGAR*' },
+  { body: '2. *Quiero servicio para mi COMERCIO/OFICINA*' },
+  { body: '3. *Quiero servicio para mi EMPRESA/CORPORATIVO*' },
+];
 
 export const quieroSerClienteFlow = addKeyword(
   utils.setEvent('SER_CLIENTE')
 ).addAnswer(
-  textServicio + textOpciones,
+  textServicio + textOpciones.map((b) => `\n${b.body}`),
   {
     capture: true,
     // buttons: [

@@ -115,13 +115,18 @@ export const socioNombreFlow = addKeyword(
   }
 );
 
-const textOpciones =
-  '\n1. *Quiero saber sobre mi servicio*\n2. *Necesito mi factura*\n3. *Medios de pago*\n4. *Deseo hablar con un operador*\n5. *Necesito soporte ó asistencia técnica*';
+const textOpciones = [
+  { body: '1. *Quiero saber sobre mi servicio*' },
+  { body: '2. *Necesito mi factura*' },
+  { body: '3. *Medios de pago*' },
+  { body: '4. *Deseo hablar con un operador*' },
+  { body: '5. *Necesito soporte ó asistencia técnica*' },
+];
 
 export const mainClientFlow = addKeyword(utils.setEvent('CLIENTES')).addAnswer(
   // 'Bienvenido a nuestra gestión, por favor seleccione una opción para continuar:',
   'Bienvenido a nuestra gestión, por favor ingrese una opción para continuar (*solo números*):' +
-    textOpciones,
+    textOpciones.map((b) => `\n${b.body}`),
   {
     capture: true,
     // buttons: [

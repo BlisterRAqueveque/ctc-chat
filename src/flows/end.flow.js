@@ -1,12 +1,12 @@
 import { addKeyword, utils } from '@builderbot/bot';
 import { mainMenuFlow } from './main.flow.js';
 
-const text = '\nSi (*volver al menú principal*)\nNo';
+const text = [{ body: 'Si (*volver al menú principal*)' }, { body: 'NO' }];
 
 export const preFinishFlow = addKeyword(
   utils.setEvent('FINISH_FLOW')
 ).addAnswer(
-  '¿Tiene otra Consulta?' + text,
+  '¿Tiene otra Consulta?' + text.map((b) => `\n${b.body}`),
   {
     capture: true,
     // buttons: [{ body: 'Si (volver al menú principal)' }, { body: 'NO' }],
