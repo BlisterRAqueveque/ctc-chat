@@ -1,6 +1,6 @@
 import { createBot, createFlow, createProvider } from '@builderbot/bot';
 import { MysqlAdapter as Database } from '@builderbot/database-mysql';
-import { BaileysProvider as Provider } from '@builderbot/provider-baileys';
+import { MetaProvider as Provider } from '@builderbot/provider-meta';
 
 import * as flows from './flows/index.js';
 
@@ -41,7 +41,12 @@ const main = async () => {
     flows.finishFlow,
   ]);
 
-  const adapterProvider = createProvider(Provider);
+  const adapterProvider = createProvider(Provider, {
+    jwtToken: envs.JWTOKEN, //EAARBW3ZBGU0UBAACDjtQIzI8JuEa.............
+    numberId: envs.NUMBER_ID, //103975305758520
+    verifyToken: envs.VERIFY_TOKEN, //LO_QUE_SEA,
+    version: 'v16.0',
+  });
 
   const adapterDB = new Database({
     host: envs.MYSQL_DB_HOST,
