@@ -20,7 +20,7 @@ export const soporteInternetFlow = addKeyword(
   )
   .addAnswer(
     `¿De qué localidad sos?  
- Centenario  
+1️⃣ Centenario  
 2️⃣ Vista Alegre  
 3️⃣ Lago Mari Menuco  
 4️⃣ Senillosa  
