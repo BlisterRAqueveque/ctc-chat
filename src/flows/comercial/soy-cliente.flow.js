@@ -74,6 +74,7 @@ export const socioNombreFlow = addKeyword(
           street: 'street',
           city: 'city',
         },
+        status: 200,
       };
 
       console.log('[FLOW] Resultado de Odoo:', resultado);
