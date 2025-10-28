@@ -250,6 +250,22 @@ const main = async () => {
     })
   );
 
+  adapterProvider.server.get('/v1/logout', async (req, res) => {
+    try {
+      const instance = await adapterProvider.getInstance();
+
+      if (instance?.logout) {
+        await instance.logout();
+        res.end('logout success');
+      } else {
+        res.end('No se pudo cerrar sesión: instancia inválida');
+      }
+    } catch (error) {
+      console.error('❌ Error al cerrar sesión:', error);
+      res.end('Error al cerrar sesión');
+    }
+  });
+
   httpServer(PORT);
 };
 
