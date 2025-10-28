@@ -3,6 +3,8 @@ import { addKeyword, utils } from '@builderbot/bot';
 // import { odooService } from '../services/odoo.service.js';
 // import { envs } from '../configuration/envs.js';
 import { aboutClientFlow } from './soy-cliente.subflow-01.js';
+import { soportePrincipalFlow } from '../tecnica/main-tecnica.flow.js';
+import { mainFacturaFlow } from './soy-cliente.subflow-02.js';
 
 const infoOne =
   'Para poder ayudarte, por favor Indicar:\n1. Nº de cliente/teléfono (ver como aparece el formato en Odoo)';
@@ -128,9 +130,9 @@ export const socioNombreFlow = addKeyword(
 
 const textOpciones = [
   { body: '1. *Quiero saber sobre mi servicio*' },
-  { body: '2. *Necesito mi factura*' },
-  { body: '3. *Medios de pago*' },
-  { body: '4. *Deseo hablar con un operador*' },
+  { body: '2. *Necesito mi factura*' }, // TODO
+  { body: '3. *Medios de pago*' }, // TODO
+  { body: '4. *Deseo hablar con un operador*' }, // TODO
   { body: '5. *Necesito soporte ó asistencia técnica*' },
 ];
 
@@ -156,14 +158,14 @@ export const mainClientFlow = addKeyword(utils.setEvent('CLIENTES')).addAnswer(
     switch (true) {
       case opt.includes('1'):
         return gotoFlow(aboutClientFlow);
-      //   case opt.includes('2'):
-      //     return gotoFlow(reactivarServicioFlow);
+      case opt.includes('2'):
+        return gotoFlow(mainFacturaFlow);
       //   case opt.includes('3'):
       //     return gotoFlow(socioFlow);
       //   case opt.includes('4'):
       //     return gotoFlow(socioFlow);
-      //   case opt.includes('5'):
-      //     return gotoFlow(socioFlow);
+      case opt.includes('5'):
+        return gotoFlow(soportePrincipalFlow);
       default:
         return fallBack('⚠️ Opción inválida.');
     }
