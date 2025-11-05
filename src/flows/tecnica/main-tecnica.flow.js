@@ -19,6 +19,8 @@ export const soportePrincipalFlow = addKeyword(
   async (ctx, { gotoFlow, fallBack }) => {
     const opt = ctx.body.trim();
 
+    if (opt == 'salir') return;
+
     switch (opt) {
       case '1':
         return gotoFlow(soporteInternetFlow);

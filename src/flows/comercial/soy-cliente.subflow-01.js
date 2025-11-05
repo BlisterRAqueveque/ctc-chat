@@ -28,7 +28,13 @@ export const aboutClientFlow = addKeyword(
   async (ctx, { fallBack, gotoFlow, state }) => {
     const opt = ctx.body;
 
-    if (opt == 'salir') return;
+    if (opt.toLocaleLowerCase() == 'salir') return;
+
+    const consulta =
+      textAbout
+        .map((t) => t.body)
+        .find((t) => t.includes(opt))
+        ?.split('. ')[1] || '';
 
     switch (true) {
       case opt.includes('1'): {
@@ -41,12 +47,12 @@ export const aboutClientFlow = addKeyword(
         return gotoFlow(miServicioFlow);
       }
       case opt.includes('2'): {
-        await state.update({ consulta: ctx.body.split('. ')[1] });
+        await state.update({ consulta });
 
         return gotoFlow(cambioDomicilioFlow);
       }
       case opt.includes('3'): {
-        await state.update({ consulta: ctx.body.split('. ')[1] });
+        await state.update({ consulta });
 
         return gotoFlow(aumentarVelocidadFlow);
       }
@@ -127,6 +133,11 @@ export const endMessageAboutFlow = addKeyword(
     const { nro_cliente, nombre, dni } = state.getMyState();
 
     if (opt.includes('0')) {
+      const consulta =
+        textEnd
+          .map((t) => t.body)
+          .find((t) => t.includes(opt))
+          ?.split('. ')[1] || '';
       fetch(`${envs.API_URL}v1/registros-cliente`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -135,7 +146,7 @@ export const endMessageAboutFlow = addKeyword(
           nombre,
           dni,
           telefono: ctx.from,
-          consulta: ctx.body.split('. ')[1],
+          consulta,
         }),
       })
         .then(async (res) => {

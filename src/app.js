@@ -43,9 +43,19 @@ const main = async () => {
     /** Asistencia técnica */
     flows.soportePrincipalFlow,
     flows.soporteInternetFlow,
+    flows.sinAccesoInternetFlow,
+    flows.sinAccesoInternetUnoFlow,
+    flows.sinAccesoInternetDosFlow,
+    flows.sinAccesoInternetTresFlow,
+    flows.sinAccesoInternetCuatroFlow,
+    flows.sinAccesoInternetCincoFlow,
+    flows.sinAccesoInternetFinFlow,
+
     flows.soporteTelefoniaFlow,
     flows.soporteAsistenciaFlow,
     flows.soporteOtrosFlow,
+    flows.preFinishTecnicaFlow,
+    flows.finishTecnicaFlow,
   ]);
 
   const adapterProvider = createProvider(Provider);
@@ -232,6 +242,55 @@ const main = async () => {
           .query(
             'INSERT INTO registros_clientes (nro_cliente, nombre, dni, telefono, consulta, lat, lon, ubicacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [nro_cliente, nombre, dni, telefono, consulta, lat, lon, ubicacion]
+          );
+
+        // result.insertId contiene el ID generado
+        // TODO La idea es poder insertar en ODOO, y enviar el n° de ticket al usuario
+        const ticketId = result.insertId;
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ status: 'ok', ticketId }));
+      } catch (error) {
+        console.error(error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        return res.end(
+          JSON.stringify({ status: 'error', message: error.message })
+        );
+      }
+    })
+  );
+
+  await adapterDB.db.promise().query(`
+    CREATE TABLE IF NOT EXISTS registros_tecnica_clientes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nro_cliente VARCHAR(255),
+      telefono VARCHAR(255),
+      dni VARCHAR(255),
+      nombre VARCHAR(255),
+      consulta VARCHAR(255),
+      localidad VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  adapterProvider.server.post(
+    '/v1/registros-tecnica-cliente',
+    handleCtx(async (_, req, res) => {
+      try {
+        const {
+          nro_cliente,
+          nombre,
+          dni,
+          telefono,
+          consulta = '',
+          localidad = '',
+        } = req.body;
+
+        //! Insertamos los datos en nuestra base de datos personal
+        const [result] = await adapterDB.db
+          .promise()
+          .query(
+            'INSERT INTO registros_clientes (nro_cliente, nombre, dni, telefono, consulta, localidad) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [nro_cliente, nombre, dni, telefono, consulta, localidad]
           );
 
         // result.insertId contiene el ID generado

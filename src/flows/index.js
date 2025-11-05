@@ -13,3 +13,4 @@ export * from './tecnica/internet.flow.js';
 export * from './tecnica/telefonia.flow.js';
 export * from './tecnica/asistencia-instalacion.flow.js';
 export * from './tecnica/otros.flow.js';
+export * from './tecnica/end-tecnica.flow.js';
