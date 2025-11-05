@@ -1,5 +1,5 @@
 import { addKeyword, utils } from '@builderbot/bot';
-import { preFinishFlow } from './end.flow.js';
+import { preFinishFlow } from './05.end.flow.js';
 import { envs } from '../../configuration/envs.js';
 import { localidades } from '../../common/index.js';
 

@@ -2,9 +2,9 @@ import { addKeyword, utils } from '@builderbot/bot';
 // import { mainClientFlow } from './soy-cliente.subflow.js';
 // import { odooService } from '../services/odoo.service.js';
 // import { envs } from '../configuration/envs.js';
-import { aboutClientFlow } from './soy-cliente.subflow-01.js';
-import { soportePrincipalFlow } from '../tecnica/main-tecnica.flow.js';
-import { mainFacturaFlow } from './soy-cliente.subflow-02.js';
+import { aboutClientFlow } from './04.soy-cliente.subflow-01.js';
+import { soportePrincipalFlow } from '../tecnica/01.main-tecnica.flow.js';
+import { mainFacturaFlow } from './04.soy-cliente.subflow-02.js';
 
 const infoOne =
   'Para poder ayudarte, por favor Indicar:\n1. Nº de cliente/teléfono (ver como aparece el formato en Odoo)';
@@ -51,7 +51,7 @@ export const socioNombreFlow = addKeyword(
   async (ctx, { state, gotoFlow, flowDynamic, endFlow }) => {
     const opt = ctx.body;
 
-    if (opt.toLocaleLowerCase() == 'salir') return;
+    if (opt.trim().toLowerCase() === 'salir') return;
 
     await state.update({ nombre: opt });
 

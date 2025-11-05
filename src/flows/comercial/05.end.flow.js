@@ -1,13 +1,12 @@
 import { addKeyword, utils } from '@builderbot/bot';
-import { soportePrincipalFlow } from './main-tecnica.flow.js';
+import { mainMenuFlow } from './01.main.flow.js';
 
 const text = [{ body: 'Si (*volver al menú principal*)' }, { body: 'NO' }];
 
-export const preFinishTecnicaFlow = addKeyword(
-  utils.setEvent('TECNICA_FINISH_FLOW')
+export const preFinishFlow = addKeyword(
+  utils.setEvent('FINISH_FLOW')
 ).addAnswer(
-  '¿Tiene otra Consulta? (*ingresa solo números*)' +
-    text.map((b) => `\n${b.body}`),
+  '¿Tiene otra Consulta?' + text.map((b) => `\n${b.body}`),
   {
     capture: true,
     // buttons: [{ body: 'Si (volver al menú principal)' }, { body: 'NO' }],
@@ -17,14 +16,14 @@ export const preFinishTecnicaFlow = addKeyword(
 
     switch (true) {
       case opt.toLocaleLowerCase().contains('si'):
-        return gotoFlow(soportePrincipalFlow);
+        return gotoFlow(mainMenuFlow);
       default:
-        return gotoFlow(finishTecnicaFlow);
+        return gotoFlow(finishFlow);
     }
   }
 );
 
-export const finishTecnicaFlow = addKeyword(['salir']).addAnswer(
+export const finishFlow = addKeyword(['salir']).addAnswer(
   'Gracias por Comunicarse con *Cooperativa Telefónica Centenario*',
   null,
   async (_, { endFlow }) => {

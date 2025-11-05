@@ -1,6 +1,6 @@
 import { addKeyword, utils } from '@builderbot/bot';
 import { localidades } from '../../common/index.js';
-import { preFinishTecnicaFlow } from './end-tecnica.flow.js';
+import { preFinishTecnicaFlow } from './06.end-tecnica.flow.js';
 import { envs } from '../../configuration/envs.js';
 
 const text = [
@@ -19,7 +19,7 @@ export const soporteInternetFlow = addKeyword(
   async (ctx, { fallBack }) => {
     const opt = ctx.body.trim();
 
-    if (opt.toLocaleLowerCase() == 'salir') return;
+    if (opt.trim().toLowerCase() === 'salir') return;
 
     if (!['1', '2', '3'].includes(opt))
       return fallBack(`Opción ingresada incorrecta.\n${soporteInternetText}`);
@@ -56,7 +56,7 @@ export const soporteInternetLocalidadFlow = addKeyword(
         'Servicio de *CACNET* Comunicate al WhatsApp 2984530580 o por mail a cacnet.oficina@gmail.com'
       );
 
-      const localidad = localidades[+opt];
+      const localidad = localidades[opt - 1];
       await state.update({ localidad });
 
       return gotoFlow(preFinishTecnicaFlow);
@@ -69,20 +69,23 @@ export const soporteInternetLocalidadFlow = addKeyword(
 const textTwo = [
   { body: '1. *Cortes*' },
   { body: '2. *Lentitud*' },
-  { body: '3. *Sin acceso a internet*' }, //TODO Acá podemos poner un tipo de ayuda para guiar al usuario
+  { body: '3. *Sin acceso a internet*' },
   { body: '4. *Otros (escribí tu caso)*' },
 ];
 
+const soporteInternetInconvenienteText =
+  '¿Qué tipo de inconveniente tenés? (*ingresa solo números*):' +
+  textTwo.map((b) => `\n${b.body}`);
 export const soporteInternetInconveniente = addKeyword(
   utils.setEvent('INTERNET_INCONVENIENTE_TECNICA')
 ).addAnswer(
-  '¿Qué tipo de inconveniente tenés? (*ingresa solo números*):' +
-    textTwo.map((b) => `\n${b.body}`),
+  soporteInternetInconvenienteText,
   { capture: true },
-  async (ctx, { flowDynamic, gotoFlow, state }) => {
+  async (ctx, { gotoFlow, state, fallBack }) => {
     const opt = ctx.body.trim();
 
-    if (opt.toLocaleLowerCase() == 'salir') return;
+    if (opt.trim().toLowerCase() === 'salir') return;
+
     const consulta =
       textTwo
         .map((t) => t.body)
@@ -91,11 +94,20 @@ export const soporteInternetInconveniente = addKeyword(
 
     await state.update({ consulta });
 
-    await flowDynamic(
-      '¡Perfecto! Uno de nuestros técnicos recibirá tu reclamo y seguirá curso para su pronta reparación. En caso de ser necesaria una visita, el plazo máximo es de *72hs hábiles*.'
-    );
-
-    return gotoFlow(preFinishTecnicaFlow);
+    switch (+opt) {
+      case 1:
+        return gotoFlow(soporteInternetFinFlow);
+      case 2:
+        return gotoFlow(soporteInternetFinFlow);
+      case 3:
+        return gotoFlow(sinAccesoInternetFlow);
+      case 4:
+        return gotoFlow(soporteInternetOtrosFlow);
+      default:
+        return fallBack(
+          `Opción ingresada incorrecta.\n${soporteInternetInconvenienteText}`
+        );
+    }
   }
 );
 
@@ -168,7 +180,7 @@ export const sinAccesoInternetDosFlow = addKeyword(
 export const sinAccesoInternetTresFlow = addKeyword(
   utils.setEvent('INTERNET_CORTE_TECNICA_TRES')
 ).addAnswer(
-  `3. 📱 Probá en otro aparato. En caso que tenga otro modem, probá cambiando el modem; es tan sencillo como quitar el cable de internet, y colocarlo en el otro.\n${solucionText}`,
+  `3. 📱 Probá en otro aparato.\nEn caso que tenga otro modem, probá cambiando el modem; es tan sencillo como quitar el cable de internet, y colocarlo en el otro.\n${solucionText}`,
   { capture: true },
   async (ctx, { gotoFlow, flowDynamic, fallBack }) => {
     const opt = ctx.body.trim().toLocaleLowerCase();
@@ -218,7 +230,7 @@ export const sinAccesoInternetCuatroFlow = addKeyword(
 export const sinAccesoInternetCincoFlow = addKeyword(
   utils.setEvent('INTERNET_CORTE_TECNICA_CINCO')
 ).addAnswer(
-  `4. 🔁 Por último, apagá el módem, espera 30 segundos, y volvé a prenderlo.\n${solucionText}`,
+  `5. 🔁 Por último, apagá el módem, espera 30 segundos, y volvé a prenderlo.\n${solucionText}`,
   { capture: true },
   async (ctx, { gotoFlow, flowDynamic, fallBack }) => {
     const opt = ctx.body.trim().toLocaleLowerCase();
@@ -233,14 +245,30 @@ export const sinAccesoInternetCincoFlow = addKeyword(
         return gotoFlow(preFinishTecnicaFlow);
       }
       case 'no':
-        return gotoFlow(sinAccesoInternetFinFlow);
+        return gotoFlow(soporteInternetFinFlow);
       default:
         return fallBack(`Opción ingresada incorrecta.\n${solucionText}`);
     }
   }
 );
 
-export const sinAccesoInternetFinFlow = addKeyword(
+export const soporteInternetOtrosFlow = addKeyword(
+  utils.setEvent('INTERNET_OTROS_TECNICA')
+).addAnswer(
+  'Describí tu inconveniente, solo texto:',
+  { capture: true },
+  async (ctx, { gotoFlow, state }) => {
+    const consulta = ctx.body.trim();
+
+    if (consulta.toLocaleLowerCase() == 'salir') return;
+
+    await state.update({ consulta });
+
+    return gotoFlow(soporteInternetFinFlow);
+  }
+);
+
+export const soporteInternetFinFlow = addKeyword(
   utils.setEvent('INTERNET_CORTE_TECNICA_FIN')
 ).addAnswer(
   'Muy bien...',
@@ -272,16 +300,15 @@ export const sinAccesoInternetFinFlow = addKeyword(
         let ticketId = json ? json.ticketId : 'Sin ticket asignado';
 
         await flowDynamic(
-          `Perfecto ${nombre}! Un asesor comercial recibió tu consulta y te responderá en horario laboral (Lun-Vie 08:00 a 15:30). La consulta fue elevada con el ticket n° ${ticketId}`
+          `¡Perfecto! Uno de nuestros técnicos recibirá tu reclamo y seguirá curso para su pronta reparación. En caso de ser necesaria una visita, el plazo máximo es de *72hs hábiles*. La consulta fue elevada con el ticket n° ${ticketId}`
         );
 
         return gotoFlow(preFinishTecnicaFlow);
       })
       .catch(async (err) => {
+        console.error(err);
         await flowDynamic(
-          `Ocurrió un error durante la obtención de la información. Error: ${JSON.stringify(
-            err
-          )}`
+          'Ocurrió un error al registrar tu reclamo. Por favor, intentá más tarde.'
         );
         return gotoFlow(preFinishTecnicaFlow);
       });

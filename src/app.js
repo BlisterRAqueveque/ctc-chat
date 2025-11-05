@@ -10,23 +10,29 @@ const PORT = envs.PORT;
 
 const main = async () => {
   const adapterFlow = createFlow([
+    //<===================== Comercial =====================>
+    /** Asistencia comercial 01 */
     flows.mainMenuFlow,
 
+    /** Asistencia comercial 02 */
     flows.registrar,
-    flows.quieroSerClienteFlow,
+    flows.otraLocalidad,
     flows.ubicacionFlow,
     flows.nombreFlow,
-    flows.otraLocalidad,
+    flows.quieroSerClienteFlow,
 
+    /** Asistencia comercial 03 */
     flows.reactivarServicioFlow,
     flows.reactivarNombreFlow,
     flows.reactivarLocalidadFlow,
 
+    /** Asistencia comercial 04 */
     flows.socioFlow,
     flows.socioDNIFlow,
     flows.socioNombreFlow,
-
     flows.mainClientFlow,
+
+    /** Asistencia comercial 05 */
     flows.aboutClientFlow,
     flows.miServicioFlow,
     flows.endMessageAboutFlow,
@@ -35,25 +41,46 @@ const main = async () => {
     flows.otrasConsultasFlow,
     flows.endMessageFlow,
 
+    /** Asistencia comercial 06 */
     flows.mainFacturaFlow,
 
+    /** Asistencia comercial 07 */
     flows.preFinishFlow,
     flows.finishFlow,
 
-    /** Asistencia técnica */
+    //<===================== Técnica =====================>
+    /** Asistencia técnica 01 */
     flows.soportePrincipalFlow,
+
+    /** Asistencia técnica 02 */
     flows.soporteInternetFlow,
+    flows.soporteInternetLocalidadFlow,
+    flows.soporteInternetInconveniente,
     flows.sinAccesoInternetFlow,
     flows.sinAccesoInternetUnoFlow,
     flows.sinAccesoInternetDosFlow,
     flows.sinAccesoInternetTresFlow,
     flows.sinAccesoInternetCuatroFlow,
     flows.sinAccesoInternetCincoFlow,
-    flows.sinAccesoInternetFinFlow,
+    flows.soporteInternetFinFlow,
 
+    /** Asistencia técnica 03 */
+    flows.soporteTelefoniaMainFlow,
+    flows.soporteTelefoniaLocalidadFlow,
     flows.soporteTelefoniaFlow,
+    flows.soporteTelefoniaOtrosFlow,
+    flows.soporteTelefoniaFinFlow,
+
+    /** Asistencia técnica 04 */
     flows.soporteAsistenciaFlow,
+    flows.soporteAsistenciaDatoFlow,
+    flows.soporteInstalacionDatoFlow,
+    flows.soporteAsistenciaFinFlow,
+
+    /** Asistencia técnica 05 */
     flows.soporteOtrosFlow,
+
+    /** Asistencia técnica 06 */
     flows.preFinishTecnicaFlow,
     flows.finishTecnicaFlow,
   ]);
@@ -269,6 +296,9 @@ const main = async () => {
       nombre VARCHAR(255),
       consulta VARCHAR(255),
       localidad VARCHAR(255),
+      servicio VARCHAR(255),
+      tipoGestion VARCHAR(255),
+      dato VARCHAR(255),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -283,14 +313,27 @@ const main = async () => {
           telefono,
           consulta = '',
           localidad = '',
+          servicio = '',
+          tipoGestion = '',
+          dato = '',
         } = req.body;
 
         //! Insertamos los datos en nuestra base de datos personal
         const [result] = await adapterDB.db
           .promise()
           .query(
-            'INSERT INTO registros_clientes (nro_cliente, nombre, dni, telefono, consulta, localidad) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [nro_cliente, nombre, dni, telefono, consulta, localidad]
+            'INSERT INTO registros_tecnica_clientes (nro_cliente, nombre, dni, telefono, consulta, localidad, servicio, tipoGestion, dato) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+              nro_cliente,
+              nombre,
+              dni,
+              telefono,
+              consulta,
+              localidad,
+              servicio,
+              tipoGestion,
+              dato,
+            ]
           );
 
         // result.insertId contiene el ID generado

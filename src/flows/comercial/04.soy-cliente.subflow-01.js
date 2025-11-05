@@ -1,6 +1,6 @@
 import { addKeyword, utils } from '@builderbot/bot';
 import { envs } from '../../configuration/envs.js';
-import { mainClientFlow } from './soy-cliente.flow.js';
+import { mainClientFlow } from './04.soy-cliente.flow.js';
 
 const textAbout = [
   { body: '1. *¿Qué servicio tengo?*' },
@@ -28,7 +28,7 @@ export const aboutClientFlow = addKeyword(
   async (ctx, { fallBack, gotoFlow, state }) => {
     const opt = ctx.body;
 
-    if (opt.toLocaleLowerCase() == 'salir') return;
+    if (opt.trim().toLowerCase() === 'salir') return;
 
     const consulta =
       textAbout
