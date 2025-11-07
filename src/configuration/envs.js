@@ -18,6 +18,9 @@ const envsSchema = joi
     ODOO_USERID: joi.number().required(),
     ODOO_PASSWORD: joi.string().required(),
     ODOO_API_KEY: joi.string().required(),
+    ODOO_API: joi.string().required(),
+    ODOO_LOGIN: joi.string().required(),
+    ODOO_PASS: joi.string().required(),
   })
   .unknown(true);
 
@@ -40,4 +43,8 @@ export const envs = {
   ODOO_USERID: envsVar.ODOO_USERID,
   ODOO_PASSWORD: envsVar.ODOO_PASSWORD,
   ODOO_API_KEY: envsVar.ODOO_API_KEY,
+
+  ODOO_API: envsVar.ODOO_API,
+  ODOO_LOGIN: envsVar.ODOO_LOGIN,
+  ODOO_PASS: envsVar.ODOO_PASS,
 };

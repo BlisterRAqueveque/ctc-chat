@@ -5,6 +5,7 @@ import { BaileysProvider as Provider } from '@builderbot/provider-baileys';
 import * as flows from './flows/index.js';
 
 import { envs } from './configuration/envs.js';
+import { getPartnerServices } from './services/odoo-service.js';
 
 const PORT = envs.PORT;
 
@@ -367,6 +368,8 @@ const main = async () => {
       res.end('Error al cerrar sesión');
     }
   });
+
+  getPartnerServices(9551);
 
   httpServer(PORT);
 };
