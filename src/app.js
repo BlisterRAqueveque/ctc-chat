@@ -5,6 +5,7 @@ import { BaileysProvider as Provider } from '@builderbot/provider-baileys';
 import * as flows from './flows/index.js';
 
 import { envs } from './configuration/envs.js';
+// import { createTicket } from './services/ticket-service.js';
 
 const PORT = envs.PORT;
 
@@ -367,6 +368,25 @@ const main = async () => {
       res.end('Error al cerrar sesión');
     }
   });
+
+  // const ticketMock = {
+  //   tipo_servicio: 'Internet',
+  //   tipo_cliente: 'HOGAR',
+  //   localidad: 'CENTENARIO',
+  //   numero_telefono: '2995123456',
+  //   dni_cuit: '30111222',
+  //   title_name: 'Sin conexión desde anoche',
+  //   detalle_inconveniente: 'El router prende pero no tengo acceso a internet',
+  //   partner_id: 125, // ID del cliente en Odoo (puede ser cualquier int existente)
+  //   suscription_id: 'S00185', // si tu Odoo usa contratos/suscripciones
+  //   associated_line_id: '2207373782',
+  //   team_id: 1, // ID del equipo de soporte (ver en Odoo → Helpdesk → Equipos)
+  //   ticket_type_id: 'Reclamo Técnico',
+  // };
+
+  // const ticket = await createTicket(ticketMock);
+
+  // console.log(ticket);
 
   httpServer(PORT);
 };

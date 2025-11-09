@@ -1,6 +1,6 @@
 import { envs } from '../configuration/envs.js';
 
-const fetchSessionID = async () => {
+export const fetchSessionID = async () => {
   const dir = `${envs.ODOO_API}web/session/authenticate`;
 
   const body = {
@@ -49,8 +49,6 @@ const fetchSessionID = async () => {
 export const getPartner = async (query = []) => {
   const dir = `${envs.ODOO_API}/jsonrpc`;
   const { session_id, user_uid } = await fetchSessionID(); // tu función que obtiene el session_id válido
-
-  //const consulta = ['vat', '=', cuil]
 
   const body = {
     jsonrpc: '2.0',
