@@ -2,9 +2,10 @@ import { addKeyword, utils } from '@builderbot/bot';
 // import { mainClientFlow } from './soy-cliente.subflow.js';
 // import { odooService } from '../services/odoo.service.js';
 // import { envs } from '../configuration/envs.js';
-import { aboutClientFlow } from './04.soy-cliente.subflow-01.js';
 import { soportePrincipalFlow } from '../tecnica/01.main-tecnica.flow.js';
+import { aboutClientFlow } from './04.soy-cliente.subflow-01.js';
 import { mainFacturaFlow } from './04.soy-cliente.subflow-02.js';
+import { getPartner } from '../../services/odoo-service.js';
 
 const infoOne =
   'Para poder ayudarte, por favor Indicar:\n1. Nº de cliente/teléfono (ver como aparece el formato en Odoo)';
@@ -59,67 +60,41 @@ export const socioNombreFlow = addKeyword(
 
     try {
       await flowDynamic('🔍 Verificando tu información en nuestro sistema...');
-
       console.log('[FLOW] Validando con Odoo:', data);
 
-      // const resultado = await odooService.validarAsociado(
-      //   data.nro_cliente,
-      //   data.dni,
-      //   data.nombre
-      // );
-      const resultado = {
-        data: {
-          x_studio_id_de_contrato: 'x_studio_id_de_contrato',
-          name: 'name',
-          phone: 'phone',
-          email: 'email',
-          street: 'street',
-          city: 'city',
-        },
-        status: 200,
-      };
+      const resultado = (await getPartner([['vat', '=', data.dni]]))?.[0];
 
-      console.log('[FLOW] Resultado de Odoo:', resultado);
+      if (resultado) {
+        await state.update({
+          cliente_odoo: resultado,
+          miServicio: JSON.stringify({
+            id: resultado.x_studio_id_de_contrato,
+            nombre: resultado.name,
+            telefono: resultado.phone,
+            email: resultado.email,
+            direccion: resultado.street,
+            ciudad: resultado.city,
+          }),
+        });
 
-      switch (resultado.status) {
-        case 200:
-          // Actualizamos el state con los datos de Odoo
-          await state.update({
-            cliente_odoo: resultado.data,
-            miServicio: JSON.stringify({
-              id: resultado.data.x_studio_id_de_contrato,
-              nombre: resultado.data.name,
-              telefono: resultado.data.phone,
-              email: resultado.data.email,
-              direccion: resultado.data.street,
-              ciudad: resultado.data.city,
-            }),
-          });
-          await flowDynamic(`✅ ¡Perfecto! Hola ${resultado.data.name}.`);
-          return gotoFlow(mainClientFlow);
-
-        case 404: {
-          const retry = state.get('retry');
-          if (retry == 1) {
-            return endFlow(
-              'No fue posible verificar su información. Un asesor ya recibió su consulta, a la brevedad le responderá en horario Comercial de Lunes a Viernes de 08.00 a 15.30 hs.'
-            );
-          }
-          await flowDynamic(
-            `La información provista es incorrecta. ${resultado.message}`
-          );
-          await state.update({ retry: 1 });
-          return gotoFlow(socioFlow);
-        }
-
-        default:
-          await flowDynamic(
-            `Algo salió mal con nuestros servidores, favor de tener paciencia. Código: ${resultado.status}`
-          );
-          return gotoFlow(socioFlow);
+        await flowDynamic(`✅ ¡Perfecto! Hola ${resultado.name}.`);
+        return gotoFlow(mainClientFlow);
       }
-    } catch (err) {
-      console.error('Error en validación con Odoo:', err);
+
+      const retry = state.get('retry');
+      if (retry === 1) {
+        return endFlow(
+          'No fue posible verificar su información. Un asesor ya recibió su consulta, a la brevedad le responderá en horario comercial (Lunes a Viernes de 08:00 a 15:30 hs).'
+        );
+      }
+
+      await flowDynamic(
+        `La información provista es incorrecta o no se encuentra en el sistema.`
+      );
+      await state.update({ retry: 1 });
+      return gotoFlow(socioFlow);
+    } catch (error) {
+      console.error('Error en validación con Odoo:', error);
       await flowDynamic(
         'Error temporal de conexión. Por favor, intenta nuevamente en unos momentos.'
       );

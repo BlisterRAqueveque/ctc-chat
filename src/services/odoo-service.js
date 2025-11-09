@@ -41,7 +41,10 @@ const fetchSessionID = async () => {
 };
 
 /**
- * Para consultar por CUIL, la entrada tiene que ser: [['vat', '=', 00000000]]
+ * Consulta partners en Odoo.
+ *
+ * @param {Array} query - Ejemplo: [['vat', '=', '20304050607']]
+ * @returns {Promise<Array<{id: number, name: string, email: string|null, vat: string|null}>|null>}
  */
 export const getPartner = async (query = []) => {
   const dir = `${envs.ODOO_API}/jsonrpc`;
@@ -62,7 +65,18 @@ export const getPartner = async (query = []) => {
         'res.partner', // modelo
         'search_read', // método
         [query], // dominio de búsqueda
-        { fields: ['id', 'name', 'email', 'vat'] }, // campos a devolver
+        {
+          fields: [
+            'id',
+            'name',
+            'email',
+            'vat',
+            'phone',
+            'x_studio_id_de_contrato',
+            'street',
+            'city',
+          ],
+        }, //TODO campo del número del cliente
       ],
     },
   };
@@ -84,7 +98,7 @@ export const getPartner = async (query = []) => {
       return null;
     }
 
-    console.log(data);
+    console.log(data.result);
 
     return data.result; // devuelve el resultado del search_read
   } catch (err) {
