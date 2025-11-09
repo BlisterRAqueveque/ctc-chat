@@ -319,22 +319,22 @@ const main = async () => {
         } = req.body;
 
         //! Insertamos los datos en nuestra base de datos personal
-        const [result] = await adapterDB.db
-          .promise()
-          .query(
-            'INSERT INTO registros_tecnica_clientes (nro_cliente, nombre, dni, telefono, consulta, localidad, servicio, tipoGestion, dato) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [
-              nro_cliente,
-              nombre,
-              dni,
-              telefono,
-              consulta,
-              localidad,
-              servicio,
-              tipoGestion,
-              dato,
-            ]
-          );
+        const [result] = await adapterDB.db.promise().query(
+          `INSERT INTO registros_tecnica_clientes
+                (nro_cliente, nombre, dni, telefono, consulta, localidad, servicio, tipoGestion, dato)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            nro_cliente,
+            nombre,
+            dni,
+            telefono,
+            consulta,
+            localidad,
+            servicio,
+            tipoGestion,
+            dato,
+          ]
+        );
 
         // result.insertId contiene el ID generado
         // TODO La idea es poder insertar en ODOO, y enviar el n° de ticket al usuario
