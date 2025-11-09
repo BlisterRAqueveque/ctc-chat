@@ -6,7 +6,7 @@ const text = [{ body: 'Si (*volver al menú principal*)' }, { body: 'NO' }];
 export const preFinishTecnicaFlow = addKeyword(
   utils.setEvent('TECNICA_FINISH_FLOW')
 ).addAnswer(
-  '¿Tiene otra Consulta? (*ingresa solo números*)' +
+  '¿Tiene otra Consulta?' +
     text.map((b) => `\n${b.body}`),
   {
     capture: true,
