@@ -1,7 +1,7 @@
 import { addKeyword } from '@builderbot/bot';
-import { quieroSerClienteFlow } from './quiero-ser-cliente.flow.js';
-import { reactivarServicioFlow } from './reactivar-servicio.flow.js';
-import { socioFlow } from './soy-cliente.flow.js';
+import { quieroSerClienteFlow } from './02.quiero-ser-cliente.flow.js';
+import { reactivarServicioFlow } from './03.reactivar-servicio.flow.js';
+import { socioFlow } from './04.soy-cliente.flow.js';
 
 // const sam = `🙌 Hola! Soy *SAM* de Cooperativa Telefónica Centenario. Estoy para ayudarte.\nElija una opción:`;
 const sam = `🙌 Hola! Soy *SAM* de Cooperativa Telefónica Centenario. Estoy para ayudarte.\nIngrese una opción (*solo números*):`;

@@ -16,13 +16,15 @@ export const soporteInternetFlow = addKeyword(
 ).addAnswer(
   soporteInternetText,
   { capture: true },
-  async (ctx, { fallBack }) => {
+  async (ctx, { fallBack, gotoFlow }) => {
     const opt = ctx.body.trim();
 
     if (opt.trim().toLowerCase() === 'salir') return;
 
     if (!['1', '2', '3'].includes(opt))
       return fallBack(`Opción ingresada incorrecta.\n${soporteInternetText}`);
+
+    return gotoFlow(soporteInternetLocalidadFlow);
   }
 );
 
@@ -283,7 +285,7 @@ export const soporteInternetFinFlow = addKeyword(
 
     const telefono = ctx.from;
 
-    fetch(`${envs.API_URL}api/v1/soporte/solicitud`, {
+    fetch(`${envs.API_URL}v1/registros-tecnica-cliente`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

@@ -1,8 +1,8 @@
 import { addKeyword, utils } from '@builderbot/bot';
-import { soporteInternetFlow } from './internet.flow.js';
-import { soporteTelefoniaFlow } from './telefonia.flow.js';
-import { soporteAsistenciaFlow } from './asistencia-instalacion.flow.js';
-import { soporteOtrosFlow } from './otros.flow.js';
+import { soporteInternetFlow } from './02.internet.flow.js';
+import { soporteTelefoniaFlow } from './03.telefonia.flow.js';
+import { soporteAsistenciaFlow } from './04.asistencia-instalacion.flow.js';
+import { soporteOtrosFlow } from './05.otros.flow.js';
 
 const text = [
   { body: '1. *No tengo servicio de internet*' },
@@ -11,13 +11,19 @@ const text = [
   { body: '4. *Otros*' },
 ];
 
+const soportePrincipalFlowText =
+  '¿En qué puedo ayudarte? (*ingresa solo números*)' +
+  text.map((b) => `\n${b.body}`);
+  
 export const soportePrincipalFlow = addKeyword(
   utils.setEvent('MAIN_TECNICA')
 ).addAnswer(
-  '¿En qué puedo ayudarte?' + text.map((b) => `\n${b.body}`),
+  soportePrincipalFlowText,
   { capture: true },
   async (ctx, { gotoFlow, fallBack }) => {
     const opt = ctx.body.trim();
+
+    if (opt == 'salir') return;
 
     switch (opt) {
       case '1':
@@ -29,7 +35,9 @@ export const soportePrincipalFlow = addKeyword(
       case '4':
         return gotoFlow(soporteOtrosFlow);
       default:
-        return fallBack('Por favor, seleccioná una opción válida (1 al 4)');
+        return fallBack(
+          `Opción ingresada incorrecta.\n${soportePrincipalFlowText}`
+        );
     }
   }
 );

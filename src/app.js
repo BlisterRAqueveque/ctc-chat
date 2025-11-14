@@ -5,6 +5,7 @@ import { BaileysProvider as Provider } from '@builderbot/provider-baileys';
 import * as flows from './flows/index.js';
 
 import { envs } from './configuration/envs.js';
+// import { createTicket } from './services/ticket-service.js';
 
 const PORT = envs.PORT;
 
@@ -21,23 +22,29 @@ console.log('📋 Variables de entorno cargadas:', {
 const main = async () => {
   console.log('\n🔧 [2/6] Creando flujos del bot...');
   const adapterFlow = createFlow([
+    //<===================== Comercial =====================>
+    /** Asistencia comercial 01 */
     flows.mainMenuFlow,
 
+    /** Asistencia comercial 02 */
     flows.registrar,
-    flows.quieroSerClienteFlow,
+    flows.otraLocalidad,
     flows.ubicacionFlow,
     flows.nombreFlow,
-    flows.otraLocalidad,
+    flows.quieroSerClienteFlow,
 
+    /** Asistencia comercial 03 */
     flows.reactivarServicioFlow,
     flows.reactivarNombreFlow,
     flows.reactivarLocalidadFlow,
 
+    /** Asistencia comercial 04 */
     flows.socioFlow,
     flows.socioDNIFlow,
     flows.socioNombreFlow,
-
     flows.mainClientFlow,
+
+    /** Asistencia comercial 05 */
     flows.aboutClientFlow,
     flows.miServicioFlow,
     flows.endMessageAboutFlow,
@@ -46,17 +53,48 @@ const main = async () => {
     flows.otrasConsultasFlow,
     flows.endMessageFlow,
 
+    /** Asistencia comercial 06 */
     flows.mainFacturaFlow,
 
+    /** Asistencia comercial 07 */
     flows.preFinishFlow,
     flows.finishFlow,
 
-    /** Asistencia técnica */
+    //<===================== Técnica =====================>
+    /** Asistencia técnica 01 */
     flows.soportePrincipalFlow,
+
+    /** Asistencia técnica 02 */
     flows.soporteInternetFlow,
+    flows.soporteInternetLocalidadFlow,
+    flows.soporteInternetInconveniente,
+    flows.sinAccesoInternetFlow,
+    flows.sinAccesoInternetUnoFlow,
+    flows.sinAccesoInternetDosFlow,
+    flows.sinAccesoInternetTresFlow,
+    flows.sinAccesoInternetCuatroFlow,
+    flows.sinAccesoInternetCincoFlow,
+    flows.soporteInternetFinFlow,
+
+    /** Asistencia técnica 03 */
+    flows.soporteTelefoniaMainFlow,
+    flows.soporteTelefoniaLocalidadFlow,
     flows.soporteTelefoniaFlow,
+    flows.soporteTelefoniaOtrosFlow,
+    flows.soporteTelefoniaFinFlow,
+
+    /** Asistencia técnica 04 */
     flows.soporteAsistenciaFlow,
+    flows.soporteAsistenciaDatoFlow,
+    flows.soporteInstalacionDatoFlow,
+    flows.soporteAsistenciaFinFlow,
+
+    /** Asistencia técnica 05 */
     flows.soporteOtrosFlow,
+
+    /** Asistencia técnica 06 */
+    flows.preFinishTecnicaFlow,
+    flows.finishTecnicaFlow,
   ]);
   console.log('✅ Flujos creados correctamente');
 
@@ -276,6 +314,106 @@ const main = async () => {
       }
     })
   );
+
+  await adapterDB.db.promise().query(`
+    CREATE TABLE IF NOT EXISTS registros_tecnica_clientes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nro_cliente VARCHAR(255),
+      telefono VARCHAR(255),
+      dni VARCHAR(255),
+      nombre VARCHAR(255),
+      consulta VARCHAR(255),
+      localidad VARCHAR(255),
+      servicio VARCHAR(255),
+      tipoGestion VARCHAR(255),
+      dato VARCHAR(255),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  adapterProvider.server.post(
+    '/v1/registros-tecnica-cliente',
+    handleCtx(async (_, req, res) => {
+      try {
+        const {
+          nro_cliente,
+          nombre,
+          dni,
+          telefono,
+          consulta = '',
+          localidad = '',
+          servicio = '',
+          tipoGestion = '',
+          dato = '',
+        } = req.body;
+
+        //! Insertamos los datos en nuestra base de datos personal
+        const [result] = await adapterDB.db.promise().query(
+          `INSERT INTO registros_tecnica_clientes
+                (nro_cliente, nombre, dni, telefono, consulta, localidad, servicio, tipoGestion, dato)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            nro_cliente,
+            nombre,
+            dni,
+            telefono,
+            consulta,
+            localidad,
+            servicio,
+            tipoGestion,
+            dato,
+          ]
+        );
+
+        // result.insertId contiene el ID generado
+        // TODO La idea es poder insertar en ODOO, y enviar el n° de ticket al usuario
+        const ticketId = result.insertId;
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ status: 'ok', ticketId }));
+      } catch (error) {
+        console.error(error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        return res.end(
+          JSON.stringify({ status: 'error', message: error.message })
+        );
+      }
+    })
+  );
+
+  adapterProvider.server.get('/v1/logout', async (req, res) => {
+    try {
+      const instance = await adapterProvider.getInstance();
+
+      if (instance?.logout) {
+        await instance.logout();
+        res.end('logout success');
+      } else {
+        res.end('No se pudo cerrar sesión: instancia inválida');
+      }
+    } catch (error) {
+      console.error('❌ Error al cerrar sesión:', error);
+      res.end('Error al cerrar sesión');
+    }
+  });
+
+  // const ticketMock = {
+  //   tipo_servicio: 'Internet',
+  //   tipo_cliente: 'HOGAR',
+  //   localidad: 'CENTENARIO',
+  //   numero_telefono: '2995123456',
+  //   dni_cuit: '30111222',
+  //   title_name: 'Sin conexión desde anoche',
+  //   detalle_inconveniente: 'El router prende pero no tengo acceso a internet',
+  //   partner_id: 125, // ID del cliente en Odoo (puede ser cualquier int existente)
+  //   suscription_id: 'S00185', // si tu Odoo usa contratos/suscripciones
+  //   associated_line_id: '2207373782',
+  //   team_id: 1, // ID del equipo de soporte (ver en Odoo → Helpdesk → Equipos)
+  //   ticket_type_id: 'Reclamo Técnico',
+  // };
+
+  // const ticket = await createTicket(ticketMock);
+
+  // console.log(ticket);
 
   await adapterDB.db.promise().query(`
     CREATE TABLE IF NOT EXISTS registros_tecnica_clientes (

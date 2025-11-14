@@ -1,6 +1,6 @@
 import { addKeyword, utils } from '@builderbot/bot';
 import { localidades } from '../../common/index.js';
-import { otraLocalidad } from './quiero-ser-cliente.flow.js';
+import { otraLocalidad } from './02.quiero-ser-cliente.flow.js';
 import { envs } from '../../configuration/envs.js';
 
 export const reactivarServicioFlow = addKeyword(
@@ -29,7 +29,7 @@ export const reactivarNombreFlow = addKeyword(
   async (ctx, { state, gotoFlow }) => {
     const opt = ctx.body;
 
-    if (opt.toLocaleLowerCase() == 'salir') return;
+    if (opt.trim().toLowerCase() === 'salir') return;
 
     await state.update({ nombre: opt });
 
